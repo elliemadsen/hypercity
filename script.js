@@ -21,10 +21,47 @@ function drawConnectionLine(sourceElement, targetElement) {
     const sourceRect = sourceElement.getBoundingClientRect();
     const targetRect = targetElement.getBoundingClientRect();
     
-    // Calculate center points relative to the document (accounting for scroll)
-    const sourceX = sourceRect.left + sourceRect.width / 2 + window.scrollX;
+    // Check if we're on mobile (iPhone)
+    const screenWidth = window.innerWidth;
+    const isMobile = screenWidth <= 768;
+    
+    // Calculate connection points
+    let sourceX, targetX;
+    
+    if (isMobile) {
+        // On mobile, use fixed positions across the screen width
+        const sourceId = sourceElement.id;
+        const targetId = targetElement.id;
+        
+        // Create hash from ID to determine position
+        const getHash = (str) => {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash += str.charCodeAt(i);
+            }
+            return hash;
+        };
+        
+        // Define specific pixel positions across screen width
+        const positions = [
+            screenWidth * 0.15,  // 15% from left
+            screenWidth * 0.35,  // 35% from left  
+            screenWidth * 0.65,  // 65% from left
+            screenWidth * 0.85   // 85% from left
+        ];
+        
+        const sourceHash = getHash(sourceId);
+        const targetHash = getHash(targetId);
+        
+        sourceX = positions[sourceHash % positions.length] + window.scrollX;
+        targetX = positions[targetHash % positions.length] + window.scrollX;
+    } else {
+        // Desktop: use center points as before
+        sourceX = sourceRect.left + sourceRect.width / 2 + window.scrollX;
+        targetX = targetRect.left + targetRect.width / 2 + window.scrollX;
+    }
+    
     const sourceY = sourceRect.top + sourceRect.height / 2 + window.scrollY;
-    const targetX = targetRect.left + targetRect.width / 2 + window.scrollX;
     const targetY = targetRect.top + targetRect.height / 2 + window.scrollY;
     
     // Create line element
@@ -42,7 +79,6 @@ function drawConnectionLine(sourceElement, targetElement) {
 // Function to handle internal link clicks with smooth scrolling
 function setupInternalLinks() {
     const internalLinks = document.querySelectorAll('.internal-link');
-    console.log(`Found ${internalLinks.length} internal links`);
     
     internalLinks.forEach(link => {
         link.addEventListener('click', function(e) {
@@ -51,11 +87,11 @@ function setupInternalLinks() {
             const targetId = this.getAttribute('href').substring(1);
             const targetElement = document.getElementById(targetId);
             const sourceElement = this.closest('.paragraph');
-            
-            console.log(`Clicked link to: ${targetId}`);
-            
+                        
             if (targetElement && sourceElement) {
-                console.log(`Drawing line from ${sourceElement.id} to ${targetId}`);
+                // Update URL hash to enable back button functionality
+                history.pushState(null, null, `#${targetId}`);
+                
                 // Draw connection line
                 drawConnectionLine(sourceElement, targetElement);
                 
@@ -82,11 +118,7 @@ function updateParagraphPosition(paragraphId, x, width, y) {
         // Update data attributes
         paragraph.dataset.x = x;
         paragraph.dataset.width = width;
-        paragraph.dataset.y = y;
-        
-        console.log(`Updated ${paragraphId}: x=${x}%, width=${width}%, y=${y}%`);
-    } else {
-        console.error(`Paragraph ${paragraphId} not found`);
+        paragraph.dataset.y = y; 
     }
 }
 
@@ -118,9 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make utility functions available globally for console use
     window.updateParagraphPosition = updateParagraphPosition;
     window.getParagraphPositions = getParagraphPositions;
-    
-    console.log('Hypertext essay initialized. Use updateParagraphPosition(id, x, width, y) to reposition paragraphs.');
-});
+    });
 
 // Handle window resize
 window.addEventListener('resize', function() {

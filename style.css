@@ -60,6 +60,14 @@ h2 {
     text-align: left;
     text-indent: -2em;
     padding-left: 2em;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.bibliography-content a {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
 }
 
 /* Paragraph positioning and styling */
@@ -124,16 +132,19 @@ h2 {
     }
     
     .paragraph {
+        left: 5% !important;
+        width: 90% !important;
         padding: 8px;
     }
-}
-
-@media (max-width: 480px) {
-    body {
-        font-size: 11px;
+    
+    .title-section {
+        width: 90%;
+        padding: 15px;
     }
     
-    .paragraph {
-        padding: 6px;
+    .bibliography-section {
+        width: 90%;
+        padding: 20px;
+        bottom: -1800px;
     }
 }

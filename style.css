@@ -51,8 +51,8 @@ body {
 }
 
 .title-section h3 {
-    font-weight: 500;
-    font-size: clamp(16px, 2.5vw, 26px);
+    font-weight: 300;
+    font-size: clamp(16px, 2.5vw, 30px);
     margin-bottom: 30px;
 }
 
